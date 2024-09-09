@@ -67,6 +67,11 @@ app.get("/delete-task/:id", (req, res) => {
     });
 });
 
+app.get("/delete-tasks/", (req, res) => {
+    writeFile("tasks.json", "[]");
+    res.redirect("/");
+})
+
 app.listen(8080, () => {
     console.log("Server kuulab pordi 8080 peal");
 });
