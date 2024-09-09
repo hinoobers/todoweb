@@ -14,14 +14,14 @@ const readFile = (filename) => {
                 reject("Error!");
             }
 
-            resolve(data.split("\n"));
+            resolve(data);
         });
     });
 };
 
 app.get("/", (req, res) => {
-    readFile("tasks").then(tasks => {
-        res.render("index", {tasks});
+    readFile("tasks.json").then(tasks => {
+        res.render("index", {tasks: JSON.parse(tasks)});
     });
 });
 
@@ -29,11 +29,13 @@ app.use(express.urlencoded({extended: true}));
 
 app.post("/", (req, res) => {
     console.log("Form sent data", req.body);
-    readFile("tasks").then(tasks => {
-        tasks.push(req.body.task);
-
-        const data = tasks.join("\n");
-        fs.writeFile("./tasks", data, err => {
+    readFile("tasks.json").then(tasks => {
+        const data = JSON.parse(tasks);
+        data.push({
+            id: data.length + 1,
+            task: req.body.task
+        })
+        fs.writeFile("./tasks.json", JSON.stringify(data), err => {
             if(err) {
                 console.error(err);
                 return;
