@@ -34,7 +34,7 @@ const writeFile = (filename, content) => {
 
 app.get("/", (req, res) => {
     readFile("tasks.json").then(tasks => {
-        res.render("index", {tasks: JSON.parse(tasks)});
+        res.render("index", {tasks: JSON.parse(tasks), error: null});
     });
 });
 
@@ -42,15 +42,26 @@ app.use(express.urlencoded({extended: true}));
 
 app.post("/", (req, res) => {
     console.log("Form sent data", req.body);
-    readFile("tasks.json").then(tasks => {
-        const data = JSON.parse(tasks);
-        data.push({
-            id: data.length + 1,
-            task: req.body.task
-        })
-        writeFile("tasks.json", JSON.stringify(data));
-        res.redirect("/");
-    });
+    let error = null;
+    if(req.body.task.trim().length == 0) {
+        error = "Please insert correct task data";
+        readFile("./tasks.json").then(tasks => {
+            res.render("index", {
+                tasks: JSON.parse(tasks),
+                error
+            })
+        });
+    } else {
+        readFile("tasks.json").then(tasks => {
+            const data = JSON.parse(tasks);
+            data.push({
+                id: data.length + 1,
+                task: req.body.task
+            })
+            writeFile("tasks.json", JSON.stringify(data));
+            res.redirect("/");
+        });
+    }
 });
 
 app.get("/delete-task/:id", (req, res) => {
