@@ -14,7 +14,7 @@
         <div class="col s12">
             <div class="card">
                 <div class="card-content">
-                    <% if(error !== null) { %>
+                    <% if(typeof error !== "undefined") { %>
                         <div class="row teal lighten-4">
                             <div class="col s12">
                                 <p class="center-align"><%=error %></p>
@@ -24,13 +24,26 @@
                     <span class="card-title">ToDo list</span>
                     <div class="row">
                         <form class="col s12" method="post" action="/">
+                            <% if(typeof editing !== "undefined") { %>
+                                <input type="hidden" name="editing-task-id" value="<%= editing %>" />
+                            <% } %> 
                             <div class="row">
                                 <div class="input-field col s12">
-                                    <input placeholder="Task" id="task" type="text" name="task">
-                                    <label for="task">Insert Task</label>
+                                    <% if(typeof editing === "undefined") { %>
+                                        <input placeholder="Task" id="task" type="text" name="task">
+                                        <label for="task">Insert Task</label>
+                                    <% } else { %>
+                                        <input placeholder="Task" id="task" type="text" name="task" value="<%=tasks.filter(i => i.id == parseInt(editing))[0].task%>">
+                                        <label for="task">Update Task</label>
+                                    <% } %>
                                 </div>
                             </div>
-                            <input class="btn" type="submit" value="Add Task">
+                            <% if(typeof editing === "undefined") { %>
+                                <input class="btn" type="submit" value="Add Task">
+                            <% } else { %>
+                                <input class="btn" type="submit" id="update" name="update" value="Update Task">
+                                <input class="btn" type="button" value="Cancel" onclick="window.location.href='/'">
+                            <% } %>
                         </form>
                     </div>
                 </div>
@@ -39,7 +52,8 @@
                         <% tasks.forEach(function(task){ %>
                             <% console.log(task, "ba") %>
                             <li class="collection-item"><%= task.task %>
-                            <a href="delete-task/<%= task.id %>" class="secondary-content"> <i class="material-icons">delete</i></a></li>
+                            <a href="delete-task/<%= task.id %>" class="secondary-content"> <i class="material-icons">delete</i></a>
+                            <a href="edit-task/<%= task.id %>" class="secondary-content"> <i class="material-icons">edit</i></a></li>
                         <% }) %>
                     </ul>
                     <input class="btn" type="submit" value="Clear all" onclick="window.location.href='/delete-tasks/'">

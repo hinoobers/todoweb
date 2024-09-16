@@ -52,6 +52,26 @@ app.post("/", (req, res) => {
             })
         });
     } else {
+        if(req.body.update) {
+            readFile("./tasks.json").then(tasks => {
+                const data = JSON.parse(tasks);
+
+                data.forEach((task, index) => {
+                    if(task.id == req.body["editing-task-id"]) {
+                        data.splice(index, 1);
+                    }
+                });
+    
+                data.push({
+                    id: parseInt(req.body["editing-task-id"]),
+                    task: req.body.task
+                });
+                writeFile("tasks.json", JSON.stringify(data));
+                res.redirect("/");
+            });
+            return;
+        }
+        
         readFile("tasks.json").then(tasks => {
             const data = JSON.parse(tasks);
             data.push({
@@ -62,6 +82,15 @@ app.post("/", (req, res) => {
             res.redirect("/");
         });
     }
+});
+
+app.get("/edit-task/:id", (req, res) => {
+    readFile("./tasks.json").then(tasks => {
+        res.render("index", {
+            tasks: JSON.parse(tasks),
+            editing: req.params.id
+        });
+    });
 });
 
 app.get("/delete-task/:id", (req, res) => {
