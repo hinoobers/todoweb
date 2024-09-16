@@ -14,7 +14,7 @@
         <div class="col s12">
             <div class="card">
                 <div class="card-content">
-                    <% if(typeof error !== "undefined") { %>
+                    <% if(typeof error == "string") { %>
                         <div class="row teal lighten-4">
                             <div class="col s12">
                                 <p class="center-align"><%=error %></p>
@@ -50,10 +50,9 @@
                 <div class="card-action">
                     <ul class="collection">
                         <% tasks.forEach(function(task){ %>
-                            <% console.log(task, "ba") %>
                             <li class="collection-item"><%= task.task %>
                             <a href="delete-task/<%= task.id %>" class="secondary-content"> <i class="material-icons">delete</i></a>
-                            <a href="edit-task/<%= task.id %>" class="secondary-content"> <i class="material-icons">edit</i></a></li>
+                            <a href="/edit-task/<%= task.id %>" class="secondary-content"> <i class="material-icons">edit</i></a></li>
                         <% }) %>
                     </ul>
                     <input class="btn" type="submit" value="Clear all" onclick="window.location.href='/delete-tasks/'">

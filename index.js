@@ -41,7 +41,6 @@ app.get("/", (req, res) => {
 app.use(express.urlencoded({extended: true}));
 
 app.post("/", (req, res) => {
-    console.log("Form sent data", req.body);
     let error = null;
     if(req.body.task.trim().length == 0) {
         error = "Please insert correct task data";
@@ -56,22 +55,18 @@ app.post("/", (req, res) => {
             readFile("./tasks.json").then(tasks => {
                 const data = JSON.parse(tasks);
 
-                data.forEach((task, index) => {
-                    if(task.id == req.body["editing-task-id"]) {
-                        data.splice(index, 1);
-                    }
-                });
-    
-                data.push({
-                    id: parseInt(req.body["editing-task-id"]),
-                    task: req.body.task
-                });
-                writeFile("tasks.json", JSON.stringify(data));
-                res.redirect("/");
+                if(!req.body["editing-task-id"]) {
+                    res.redirect("/");
+                } else {
+                    data.filter(p => p.id == parseInt(req.body["editing-task-id"]))[0].task = req.body.task;
+        
+                    writeFile("tasks.json", JSON.stringify(data));
+                    res.redirect("/");
+                }
             });
             return;
         }
-        
+
         readFile("tasks.json").then(tasks => {
             const data = JSON.parse(tasks);
             data.push({
@@ -108,6 +103,10 @@ app.get("/delete-task/:id", (req, res) => {
 });
 
 app.get("/delete-tasks/", (req, res) => {
+    if(!req.get("referrer")) { // kust kohast see request tuli
+        return res.status(400).send({error: "Ainult main lehe pealt saab kustutada!"});
+    }
+    console.log("referrer", req.get("referrer"))
     writeFile("tasks.json", "[]");
     res.redirect("/");
 })
